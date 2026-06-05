@@ -1,0 +1,36 @@
+name: Polaris SCA Scan
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  polaris-sca:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Download Polaris CLI
+        run: |
+          curl -fsSLo polaris.zip \
+            "${{ secrets.POLARIS_SERVER_URL }}/api/tools/polaris_cli-linux64.zip"
+          unzip -q polaris.zip
+          chmod +x polaris
+          ./polaris --version
+
+      - name: Run Polaris SCA scan
+        env:
+          POLARIS_SERVER_URL: ${{ secrets.POLARIS_SERVER_URL }}
+          POLARIS_ACCESS_TOKEN: ${{ secrets.POLARIS_ACCESS_TOKEN }}
+        run: |
+          ./polaris analyze -w \
+            --coverity.enabled=false \
+            --sca.enabled=true
