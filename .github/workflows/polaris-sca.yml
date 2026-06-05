@@ -21,6 +21,7 @@ jobs:
       - name: Download Polaris CLI
         run: |
           curl -fsSLo polaris.zip \
+            -H "Authorization: Bearer ${{ secrets.POLARIS_ACCESS_TOKEN }}" \
             "${{ secrets.POLARIS_SERVER_URL }}/api/tools/polaris_cli-linux64.zip"
           unzip -q polaris.zip
           chmod +x polaris
